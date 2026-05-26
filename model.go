@@ -1,10 +1,5 @@
 package porcupine
 
-import (
-	"fmt"
-	"strings"
-)
-
 // An Operation is an element of a history.
 //
 // This package supports two different representations of histories, as a
@@ -170,20 +165,8 @@ type NondeterministicModel struct {
 }
 
 func merge(states []interface{}, eq func(state1, state2 interface{}) bool) []interface{} {
-	var uniqueStates []interface{}
-	for _, state := range states {
-		unique := true
-		for _, us := range uniqueStates {
-			if eq(state, us) {
-				unique = false
-				break
-			}
-		}
-		if unique {
-			uniqueStates = append(uniqueStates, state)
-		}
-	}
-	return uniqueStates
+	_ = "STUB: not implemented"
+	return nil
 }
 
 // ToModel converts a [NondeterministicModel] to a [Model] using a power set
@@ -195,111 +178,44 @@ func merge(states []interface{}, eq func(state1, state2 interface{}) bool) []int
 // function to merge states. You may be able to achieve better performance by
 // implementing a Model directly.
 func (nm *NondeterministicModel) ToModel() Model {
+	_ = "STUB: not implemented"
 	// like fillDefault
-	equal := nm.Equal
-	if equal == nil {
-		equal = shallowEqual
-	}
-	describeOperation := nm.DescribeOperation
-	if describeOperation == nil {
-		describeOperation = defaultDescribeOperation
-	}
-	describeState := nm.DescribeState
-	if describeState == nil {
-		describeState = defaultDescribeState
-	}
-	describeOperationMetadata := nm.DescribeOperationMetadata
-	if describeOperationMetadata == nil {
-		describeOperationMetadata = defaultDescribeOperationMetadata
-	}
-	return Model{
-		Partition:      nm.Partition,
-		PartitionEvent: nm.PartitionEvent,
-		// we need this wrapper to convert a []interface{} to an interface{}
-		Init: func() interface{} {
-			return merge(nm.Init(), nm.Equal)
-		},
-		Step: func(state, input, output interface{}) (bool, interface{}) {
-			states := state.([]interface{})
-			var allNextStates []interface{}
-			for _, state := range states {
-				allNextStates = append(allNextStates, nm.Step(state, input, output)...)
-			}
-			uniqueNextStates := merge(allNextStates, equal)
-			return len(uniqueNextStates) > 0, uniqueNextStates
-		},
-		// this operates on sets of states that have been merged, so we
-		// don't need to check inclusion in both directions
-		Equal: func(state1, state2 interface{}) bool {
-			states1 := state1.([]interface{})
-			states2 := state2.([]interface{})
-			if len(states1) != len(states2) {
-				return false
-			}
-			for _, s1 := range states1 {
-				found := false
-				for _, s2 := range states2 {
-					if equal(s1, s2) {
-						found = true
-						break
-					}
-				}
-				if !found {
-					return false
-				}
-			}
-			return true
-		},
-		DescribeOperation: describeOperation,
-		DescribeState: func(state interface{}) string {
-			states := state.([]interface{})
-			var descriptions []string
-			for _, state := range states {
-				descriptions = append(descriptions, describeState(state))
-			}
-			return fmt.Sprintf("{%s}", strings.Join(descriptions, ", "))
-		},
-		DescribeOperationMetadata: describeOperationMetadata,
-	}
+	return *new(Model)
 }
+
+// we need this wrapper to convert a []interface{} to an interface{}
+
+// this operates on sets of states that have been merged, so we
+// don't need to check inclusion in both directions
 
 // noPartition is a fallback partition function that partitions the history
 // into a single partition containing all of the operations.
-func noPartition(history []Operation) [][]Operation {
-	return [][]Operation{history}
-}
+func noPartition(history []Operation) [][]Operation { _ = "STUB: not implemented"; return nil }
 
 // noPartitionEvent is a fallback partition function that partitions the
 // history into a single partition containing all of the events.
-func noPartitionEvent(history []Event) [][]Event {
-	return [][]Event{history}
-}
+func noPartitionEvent(history []Event) [][]Event { _ = "STUB: not implemented"; return nil }
 
 // shallowEqual is a fallback equality function that compares two states using
 // ==.
-func shallowEqual(state1, state2 interface{}) bool {
-	return state1 == state2
-}
+func shallowEqual(state1, state2 interface{}) bool { _ = "STUB: not implemented"; return false }
 
 // defaultDescribeOperation is a fallback to convert an operation to a string.
 // It renders inputs and outputs using the "%v" format specifier.
 func defaultDescribeOperation(input interface{}, output interface{}) string {
-	return fmt.Sprintf("%v -> %v", input, output)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // defaultDescribeState is a fallback to convert a state to a string. It
 // renders the state using the "%v" format specifier.
-func defaultDescribeState(state interface{}) string {
-	return fmt.Sprintf("%v", state)
-}
+func defaultDescribeState(state interface{}) string { _ = "STUB: not implemented"; return "" }
 
 // defaultDescribeOperationMetadata is a fallback to convert metadata to a
 // string. It renders the metadata using the "%v" format specifier.
 func defaultDescribeOperationMetadata(info interface{}) string {
-	if info == nil {
-		return ""
-	}
-	return fmt.Sprintf("%v", info)
+	_ = "STUB: not implemented"
+	return ""
 }
 
 // A CheckResult is the result of a linearizability check.
